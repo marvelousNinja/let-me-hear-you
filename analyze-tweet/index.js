@@ -11,7 +11,7 @@ app.post('/init', function(req, res) {
 
 app.post('/run', function(req, res) {
   tweetAnalytics.process(req.body.value).then(function(analytics) {
-    res.sendStatus(200);
+    res.send({status: 'OK'});
   });
 });
 
