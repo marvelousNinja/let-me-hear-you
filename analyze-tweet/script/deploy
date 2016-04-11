@@ -1,0 +1,6 @@
+#!/bin/bash
+
+docker build -t marvelousninja/analyze-tweet:latest .
+docker push marvelousninja/analyze-tweet:latest
+
+wsk action update --docker analyze-tweet marvelousninja/analyze-tweet

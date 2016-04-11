@@ -1,0 +1,16 @@
+#!/bin/bash
+
+source .env
+wsk action invoke analyze-tweet --blocking --result \
+--param tone_analyzer_url ${TONE_ANALYZER_URL} \
+--param tone_analyzer_username ${TONE_ANALYZER_USERNAME} \
+--param tone_analyzer_password ${TONE_ANALYZER_PASSWORD} \
+--param twilio_sid ${TWILIO_SID} \
+--param twilio_access_key ${TWILIO_ACCESS_KEY} \
+--param twilio_phone_number ${TWILIO_PHONE_NUMBER} \
+--param twitter_access_token_key ${TWITTER_ACCESS_TOKEN_KEY} \
+--param twitter_access_token_secret ${TWITTER_ACCESS_TOKEN_SECRET} \
+--param twitter_consumer_key ${TWITTER_CONSUMER_KEY} \
+--param twitter_consumer_secret ${TWITTER_CONSUMER_SECRET} \
+--param twitter_account_display_name ${TWITTER_ACCOUNT_DISPLAY_NAME} \
+--param manager_phone_number ${MANAGER_PHONE_NUMBER}
