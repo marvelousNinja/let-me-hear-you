@@ -3,6 +3,11 @@ var Twitter = Promise.promisifyAll(require('twitter'));
 var watson = require('watson-developer-cloud');
 var twilio = require('twilio');
 
+var MAX_TWEETS_PER_PAGE = 100;
+
+/* Contains tweet ids that have been sent */
+var flaggedTweets = [];
+
 function twitterClient(params) {
   var client = new Twitter({
     consumer_key: params.twitter_consumer_key,
@@ -34,7 +39,7 @@ function twilioClient(params) {
 
 function loadTweets(params) {
   return twitterClient(params)
-    .getAsync('search/tweets', { q: params.twitter_account_display_name })
+    .getAsync('search/tweets', { q: params.twitter_account_display_name, count:MAX_TWEETS_PER_PAGE})
     .then(function(response) {
       return response.statuses;
     });
@@ -80,13 +85,23 @@ function notifyOnAnger(params, tweets) {
       to: params.manager_phone_number,
       from: params.twilio_phone_number,
       body: 'IMPORTANT! Unhappy tweet: ' + tweet.text + "\n" + 'https://twitter.com/' + tweet.user.screen_name + '/'
+    }).then(function(){
+      flaggedTweets.push(tweet.id);
     });
   }));
 }
 
 function process(params) {
   return loadTweets(params)
-    .then(function(tweets) { return analyzeTone(params, tweets) })
+    .then(function(tweets) {
+        var tweetsToAnalyze = [];
+        tweets.forEach(function(tweet) {
+          if(flaggedTweets.indexOf(tweet.id) == -1) {
+            tweetsToAnalyze.push(tweet)
+          }
+        });
+        return analyzeTone(params, tweetsToAnalyze)
+      })
     .then(function(tweets) { return notifyOnAnger(params, tweets) });
 }
 
