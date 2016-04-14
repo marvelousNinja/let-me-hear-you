@@ -4,3 +4,23 @@ docker build -t marvelousninja/analyze-tweet:latest .
 docker push marvelousninja/analyze-tweet:latest
 
 wsk action update --docker analyze-tweet marvelousninja/analyze-tweet
+
+source .env
+
+# Creating a Trigger that fires every 10 minutes.
+wsk trigger create analyzeTweetTrigger --feed /whisk.system/alarms/alarm -p cron '0 */10 * * * *' -p trigger_payload \
+"{\"tone_analyzer_url\":\"$TONE_ANALYZER_URL\",
+\"tone_analyzer_username\":\"$TONE_ANALYZER_USERNAME\",
+\"tone_analyzer_password\":\"$TONE_ANALYZER_PASSWORD\",
+\"twilio_sid\":\"$TWILIO_SID\",
+\"twilio_access_key\":\"$TWILIO_ACCESS_KEY\",
+\"twilio_phone_number\":\"$TWILIO_PHONE_NUMBER\",
+\"twitter_access_token_key\":\"$TWITTER_ACCESS_TOKEN_KEY\",
+\"twitter_access_token_secret\":\"$TWITTER_ACCESS_TOKEN_SECRET\",
+\"twitter_consumer_key\":\"$TWITTER_CONSUMER_KEY\",
+\"twitter_consumer_secret\":\"$TWITTER_CONSUMER_SECRET\",
+\"twitter_account_display_name\":\"$TWITTER_ACCOUNT_DISPLAY_NAME\",
+\"manager_phone_number\":\"$MANAGER_PHONE_NUMBER\"}"
+
+# Creating a rule that invokes the analyze-tweet action every time the analyzeTweetTrigger trigger fires.
+wsk rule create --enable analyzeTweetRule analyzeTweetTrigger analyze-tweet
